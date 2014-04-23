@@ -1,0 +1,118 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CC	makefile	/^CC=g++$/;"	m
+CENTER	include/window.h	12;"	d
+CFLAGS	makefile	/^CFLAGS=$(WARN) $/;"	m
+DEBUG	src/window.cpp	2;"	d	file:
+DEFAULT	include/window.h	7;"	d
+DEPS	makefile	/^DEPS=$(patsubst %,$(IDIR)\/%,$(HEADERS))$/;"	m
+EAST	include/window.h	13;"	d
+FULL_SCREEN	include/window.h	24;"	d
+GLX_CONTEXT_MAJOR_VERSION_ARB	include/window.h	28;"	d
+GLX_CONTEXT_MINOR_VERSION_ARB	include/window.h	29;"	d
+HEADERS	makefile	/^HEADERS=window.h$/;"	m
+HEIGHT	include/window.h	22;"	d
+IDIR	makefile	/^IDIR=include$/;"	m
+LDIR	makefile	/^LDIR=lib$/;"	m
+LIBS	makefile	/^LIBS=-lGL -lGLU -lX11 -lglog -pthread$/;"	m
+MAXIMIZED_HORIZONTAL	include/window.h	25;"	d
+MAXIMIZED_VERTICAL	include/window.h	26;"	d
+NORTH	include/window.h	9;"	d
+NORTH_EAST	include/window.h	10;"	d
+NORTH_WEST	include/window.h	8;"	d
+OBJ	makefile	/^OBJ=$(patsubst %,$(ODIR)\/%,$(OBJECTS))$/;"	m
+OBJECTS	makefile	/^OBJECTS= window.o main.o$/;"	m
+ODIR	makefile	/^ODIR=obj$/;"	m
+SDIR	makefile	/^SDIR=src$/;"	m
+SLDIR	makefile	/^SLDIR=\/usr\/lib$/;"	m
+SOUTH	include/window.h	15;"	d
+SOUTH_EAST	include/window.h	16;"	d
+SOUTH_WEST	include/window.h	14;"	d
+STATIC	include/window.h	17;"	d
+STD	makefile	/^STD=-std=c++11$/;"	m
+WARN	makefile	/^WARN=-Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -pedantic$/;"	m
+WEST	include/window.h	11;"	d
+WIDTH	include/window.h	21;"	d
+X	include/window.h	19;"	d
+Y	include/window.h	20;"	d
+attributes	include/window.h	/^  int *attributes;$/;"	m	class:window
+button_press	src/main.cpp	/^void button_press(window *sender, XButtonEvent &event) {$/;"	f
+button_release	src/main.cpp	/^void button_release(window *sender, XButtonEvent &event) {$/;"	f
+cleanup	src/window.cpp	/^void window::cleanup() {$/;"	f	class:window
+close	src/window.cpp	/^void window::close() {$/;"	f	class:window
+color_map	include/window.h	/^  Colormap       color_map;$/;"	m	class:window
+ctx_error_handler	src/window.cpp	/^int window::ctx_error_handler(Display *dpy, XErrorEvent *ev) {$/;"	f	class:window
+ctx_error_ocurred	include/window.h	/^  bool static ctx_error_ocurred;$/;"	m	class:window
+ctx_error_ocurred	src/window.cpp	/^bool window::ctx_error_ocurred = false;$/;"	m	class:window	file:
+display	src/main.cpp	/^void display() { $/;"	f
+double_buffer_attributes	src/main.cpp	/^int double_buffer_attributes[] = {$/;"	v
+dpy	include/window.h	/^  Display       *dpy;$/;"	m	class:window
+event	include/window.h	/^  XEvent         event; $/;"	m	class:window
+fb_configs	include/window.h	/^  GLXFBConfig  *fb_configs; $/;"	m	class:window
+fullscreen	src/window.cpp	/^void window::fullscreen() {$/;"	f	class:window
+get_color_map	src/window.cpp	/^Colormap window::get_color_map() {$/;"	f	class:window
+get_display	src/window.cpp	/^Display *window::get_display() {$/;"	f	class:window
+get_visual_info	src/window.cpp	/^XVisualInfo *window::get_visual_info() {$/;"	f	class:window
+get_window	src/window.cpp	/^Window window::get_window() {$/;"	f	class:window
+get_window_states	src/window.cpp	/^void window::get_window_states() {$/;"	f	class:window
+glXCreateContextAttribsARBProc	include/window.h	/^typedef GLXContext (*glXCreateContextAttribsARBProc)$/;"	t
+gl_init	include/window.h	/^  void (*gl_init)();  $/;"	m	class:window
+gl_init	src/main.cpp	/^void gl_init() {$/;"	f
+glx_context	include/window.h	/^  GLXContext    glx_context;    $/;"	m	class:window
+glx_major	include/window.h	/^  int glx_major;$/;"	m	class:window
+glx_minor	include/window.h	/^  int glx_minor;$/;"	m	class:window
+init	src/window.cpp	/^void window::init() {$/;"	f	class:window
+isExtensionSupported	src/window.cpp	/^static bool isExtensionSupported(const char *extList, const char *extension) {$/;"	f	file:
+is_double_buffer	src/window.cpp	/^bool window::is_double_buffer(int *attr) {$/;"	f	class:window
+is_fullscreen	src/window.cpp	/^bool window::is_fullscreen() {$/;"	f	class:window
+is_maximized	src/window.cpp	/^bool window::is_maximized() {$/;"	f	class:window
+is_maximized_horz	src/window.cpp	/^bool window::is_maximized_horz() {$/;"	f	class:window
+is_maximized_vert	src/window.cpp	/^bool window::is_maximized_vert() {$/;"	f	class:window
+is_running	src/window.cpp	/^bool window::is_running() {$/;"	f	class:window
+is_wnd_fullscreen	include/window.h	/^  bool is_wnd_fullscreen; $/;"	m	class:window
+is_wnd_maximized_horz	include/window.h	/^  bool is_wnd_maximized_horz;$/;"	m	class:window
+is_wnd_maximized_vert	include/window.h	/^  bool is_wnd_maximized_vert;$/;"	m	class:window
+key_press	include/window.h	/^  void (*key_press)(window*, XKeyEvent&);$/;"	m	class:window
+key_press	src/main.cpp	/^void key_press(window *sender, XKeyEvent &event) {$/;"	f
+key_release	include/window.h	/^  void (*key_release)(window*, XKeyEvent&);$/;"	m	class:window
+key_release	src/main.cpp	/^void key_release(window *sender, XKeyEvent &event) {$/;"	f
+main	src/main.cpp	/^int main(int argc, char **argv) {$/;"	f
+maximize	src/window.cpp	/^void window::maximize() {$/;"	f	class:window
+minimize	src/window.cpp	/^void window::minimize() {$/;"	f	class:window
+mouse_button_press	include/window.h	/^  void (*mouse_button_press)(window*, XButtonEvent&);$/;"	m	class:window
+mouse_button_release	include/window.h	/^  void (*mouse_button_release)(window*, XButtonEvent&);$/;"	m	class:window
+need_update	include/window.h	/^  bool need_update;$/;"	m	class:window
+normal	src/window.cpp	/^void window::normal() { $/;"	f	class:window
+reshape	include/window.h	/^  void (*reshape)(int, int); $/;"	m	class:window
+reshape	src/main.cpp	/^void reshape(int w, int h) {$/;"	f
+run	src/window.cpp	/^void window::run() {$/;"	f	class:window
+running	include/window.h	/^  bool running;   $/;"	m	class:window
+set_gl_init	src/window.cpp	/^void window::set_gl_init(void (*new_gl_init)()) {$/;"	f	class:window
+set_key_press_event	src/window.cpp	/^void window::set_key_press_event(void (*new_key_press)$/;"	f	class:window
+set_key_release_event	src/window.cpp	/^void window::set_key_release_event(void (*new_key_release)$/;"	f	class:window
+set_mouse_button_press_event	src/window.cpp	/^void window::set_mouse_button_press_event(void (*new_mouse_button_press)$/;"	f	class:window
+set_mouse_button_release_event	src/window.cpp	/^void window::set_mouse_button_release_event(void (*new_mouse_button_release)$/;"	f	class:window
+set_reshape_event	src/window.cpp	/^void window::set_reshape_event(void (*new_reshape)(int, int)) {$/;"	f	class:window
+set_window_pos	src/window.cpp	/^void window::set_window_pos(int x, int y) {$/;"	f	class:window
+set_window_size	src/window.cpp	/^void window::set_window_size(int width, int height) {$/;"	f	class:window
+single_buffer_attributes	src/main.cpp	/^int single_buffer_attributes[] = {$/;"	v
+swap_flag	include/window.h	/^  bool swap_flag;$/;"	m	class:window
+title	include/window.h	/^  std::string title;$/;"	m	class:window
+update	src/window.cpp	/^void window::update() {$/;"	f	class:window
+visual_info	include/window.h	/^  XVisualInfo   *visual_info;$/;"	m	class:window
+window	include/window.h	/^class window {$/;"	c
+window	src/window.cpp	/^window::window(std::string new_title, int *new_attributes) {$/;"	f	class:window
+wm_change_state	include/window.h	/^  Atom wm_change_state;$/;"	m	class:window
+wm_close_window	include/window.h	/^  Atom wm_close_window;$/;"	m	class:window
+wm_delete_message	include/window.h	/^  Atom wm_delete_message;$/;"	m	class:window
+wm_fullscreen	include/window.h	/^  Atom wm_fullscreen;$/;"	m	class:window
+wm_maximize_window_horz	include/window.h	/^  Atom wm_maximize_window_horz;$/;"	m	class:window
+wm_maximize_window_vert	include/window.h	/^  Atom wm_maximize_window_vert;$/;"	m	class:window
+wm_move_resize	include/window.h	/^  Atom wm_move_resize; $/;"	m	class:window
+wm_state	include/window.h	/^  Atom wm_state; $/;"	m	class:window
+wnd	include/window.h	/^  Window         wnd;$/;"	m	class:window
+~window	src/window.cpp	/^window::~window() {$/;"	f	class:window

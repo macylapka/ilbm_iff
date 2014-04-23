@@ -1,0 +1,383 @@
+#include <window.h>
+
+window::~window() {
+
+}
+
+window::window(std::string new_title, int *new_attributes) {
+  running = false;
+  swap_flag = false;  
+  this->title = new_title;
+  is_wnd_maximized_horz = false;
+  is_wnd_maximized_vert = false;
+  is_wnd_fullscreen = false;
+  dpy = NULL;
+  visual_info = NULL;
+  attributes = new_attributes;
+}
+
+void window::fullscreen() {
+  XEvent wnd_event; 
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_state;
+  wnd_event.xclient.format = 32;
+  wnd_event.xclient.data.l[0] = 1;
+  wnd_event.xclient.data.l[1] = wm_fullscreen;
+  wnd_event.xclient.data.l[2] = 0;
+  XSendEvent(dpy, parent_wnd, False, 
+    SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
+}
+
+void window::maximize() {
+  get_window_states();
+  
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_state;
+  wnd_event.xclient.format = 32;
+  if(is_wnd_fullscreen) {
+      wnd_event.xclient.data.l[0] = 0;
+      wnd_event.xclient.data.l[1] = wm_fullscreen;
+      wnd_event.xclient.data.l[2] = 0; 
+  } 
+  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
+      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
+  
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_state;
+  wnd_event.xclient.format = 32;
+  // _NET_WM_STATE_REMOVE   0   // remove/unset property
+  // _NET_WM_STATE_ADD      1   // add/set property
+  // _NET_WM_STATE_TOGGLE   2   // toggle property
+  wnd_event.xclient.data.l[0] = 1;
+  wnd_event.xclient.data.l[1] = wm_maximize_window_horz;
+  wnd_event.xclient.data.l[2] = wm_maximize_window_vert;
+  XSendEvent(dpy, parent_wnd, False, 
+    SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);  
+}
+
+void window::minimize() {
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_change_state;
+  wnd_event.xclient.format = 32;
+  //WITHDRAWN_STATE   0
+  //NORMAL_STATE      1
+  //ICONIC_STATE      3
+  wnd_event.xclient.data.l[0] = 3; 
+  XSendEvent(dpy, parent_wnd, False, 
+    SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event); 
+}
+
+void window::normal() { 
+  get_window_states();
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_state;
+  wnd_event.xclient.format = 32;
+  if(is_wnd_fullscreen) {
+      wnd_event.xclient.data.l[0] = 0;
+      wnd_event.xclient.data.l[1] = wm_fullscreen;
+      wnd_event.xclient.data.l[2] = 0; 
+  } 
+  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
+      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event); 
+  
+  if(is_wnd_maximized_horz) {
+      wnd_event.xclient.data.l[0] = 0;
+      wnd_event.xclient.data.l[1] = wm_maximize_window_horz;
+      wnd_event.xclient.data.l[2] = 0;
+      wnd_event.xclient.data.l[3] = 0; 
+  }      
+  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
+      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);   
+
+  if(is_wnd_maximized_vert) {
+      wnd_event.xclient.data.l[0] = 0;
+      wnd_event.xclient.data.l[1] = wm_maximize_window_vert;
+      wnd_event.xclient.data.l[2] = 0;
+      wnd_event.xclient.data.l[3] = 0; 
+  }      
+  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
+      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
+
+}
+
+void window::close() {
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_close_window;
+  wnd_event.xclient.format = 32;
+  wnd_event.xclient.data.l[0] = CurrentTime;
+  wnd_event.xclient.data.l[1] = 1;
+  XSendEvent(dpy, parent_wnd, False, SubstructureRedirectMask | 
+    SubstructureNotifyMask, &wnd_event);
+}
+
+void window::cleanup() {
+  if(dpy != NULL) {  
+    glXMakeCurrent(dpy, None, NULL);    
+    XDestroyWindow(dpy, wnd);  
+  }    
+  XFree(visual_info);
+}
+
+bool window::init() {
+  dpy = XOpenDisplay(NULL);
+  parent_wnd = DefaultRootWindow(dpy); 
+  
+  wm_change_state = XInternAtom(dpy, "WM_CHANGE_STATE", False);
+  wm_delete_message = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+  wm_state = XInternAtom(dpy, "_NET_WM_STATE", False); 
+  wm_close_window = XInternAtom(dpy, "_NET_CLOSE_WINDOW", False); 
+  wm_maximize_window_horz = XInternAtom(dpy, 
+    "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+  wm_maximize_window_vert = XInternAtom(dpy,
+    "_NET_WM_STATE_MAXIMIZED_VERT", False);
+  wm_fullscreen = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
+  wm_move_resize = XInternAtom(dpy, "_NET_MOVERESIZE_WINDOW", False); 
+  
+  /*
+  visual_info = glXChooseVisual(dpy, 0, attributes); 
+  glx_context = glXCreateContext(dpy, visual_info, NULL, true); 
+ 
+  color_map = XCreateColormap(dpy, parent_wnd, visual_info->visual, AllocNone);
+  window_attributes.colormap = color_map;
+  window_attributes.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | 
+    ButtonPressMask | ButtonReleaseMask | ConfigureNotify; 
+
+  wnd = XCreateWindow(dpy, parent_wnd, 
+    0, 0, 600, 600, 0, visual_info->depth, InputOutput, visual_info->visual, 
+    CWColormap | CWEventMask, &window_attributes);
+  
+  XMapWindow(dpy, wnd);
+  XStoreName(dpy, wnd, title.c_str());
+
+  glXMakeCurrent(dpy, wnd, glx_context);
+  */
+  int returned_number;
+  int swa_mask;
+
+  fb_configs = glXChooseFBConfig(dpy, DefaultScreen(dpy),
+    attributes, &returned_number);
+  swap_flag = true;
+
+  visual_info = glXGetVisualFromFBConfig(dpy, fb_configs[0]);  
+
+  window_attributes.border_pixel = 0;
+  window_attributes.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | 
+    ButtonPressMask | ButtonReleaseMask | ConfigureNotify | StructureNotifyMask;
+  window_attributes.colormap = XCreateColormap(dpy, RootWindow(dpy, visual_info->screen),
+    visual_info->visual, AllocNone);
+  swa_mask = CWBorderPixel | CWColormap | CWEventMask;
+  
+  wnd = XCreateWindow(dpy, parent_wnd, 0, 0, 640, 480, 0, 
+    visual_info->depth, InputOutput, visual_info->visual, 
+    swa_mask, &window_attributes);
+
+  context = glXCreateNewContext(dpy, fb_configs[0], GLX_RGBA_TYPE, NULL, true);
+
+  glx_win = glXCreateWindow(dpy, fb_configs[0], wnd, NULL);
+
+  XMapWindow(dpy, wnd);
+  //XIfEvent(dpy, &event, WaitFor)
+  glXMakeContextCurrent(dpy, glx_win, glx_win, context);
+
+  return true;
+}
+
+Display *window::get_display() {
+  return dpy;
+}
+
+Window window::get_window() {
+  return wnd;
+}
+
+Window window::get_parent_window() {
+  return parent_wnd;
+}
+
+XVisualInfo *window::get_visual_info() {
+  return visual_info;
+}
+
+XSetWindowAttributes window::get_window_attributes() {
+  return window_attributes;
+}
+
+Colormap window::get_color_map() {
+  return color_map;
+}
+
+void window::set_gl_init(void (*new_gl_init)()) {
+  gl_init = new_gl_init;
+}
+
+void window::set_window_size(int width, int height) {
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.display = dpy;
+  wnd_event.xclient.window = wnd;
+  wnd_event.xclient.message_type = wm_move_resize;
+  wnd_event.xclient.format = 32;
+  wnd_event.xclient.data.l[0] = WIDTH | HEIGHT;
+  wnd_event.xclient.data.l[1] = 0;
+  wnd_event.xclient.data.l[2] = 0;
+  wnd_event.xclient.data.l[3] = width;
+  wnd_event.xclient.data.l[4] = height;
+  XSendEvent(dpy, parent_wnd, False, SubstructureRedirectMask | 
+    SubstructureNotifyMask, &wnd_event);
+}
+
+void window::set_window_pos(int x, int y) {
+  XEvent wnd_event;
+  wnd_event.type = ClientMessage;
+  wnd_event.xclient.display = dpy;
+  wnd_event.xclient.window = wnd; 
+  wnd_event.xclient.message_type = wm_move_resize;
+  wnd_event.xclient.format = 32;
+  wnd_event.xclient.data.l[0] = X | Y;
+  wnd_event.xclient.data.l[1] = x;
+  wnd_event.xclient.data.l[2] = y;
+  wnd_event.xclient.data.l[3] = 0;
+  wnd_event.xclient.data.l[4] = 0;
+  XSendEvent(dpy, parent_wnd, False, SubstructureRedirectMask | 
+    SubstructureNotifyMask, &wnd_event);
+}
+
+void window::set_reshape_event(void (*new_reshape)(int, int)) {
+  reshape = new_reshape;
+}
+
+void window::set_key_press_event(void (*new_key_press)
+    (window *wnd, XKeyEvent &key_event)) {
+  key_press = new_key_press;
+}
+
+void window::set_key_release_event(void (*new_key_release)
+    (window *wnd, XKeyEvent &key_event)) {
+  key_release = new_key_release;
+}
+
+void window::set_mouse_button_press_event(void (*new_mouse_button_press)
+    (window *wnd, XButtonEvent &button_event)) {
+  mouse_button_press = new_mouse_button_press;
+}
+
+void window::set_mouse_button_release_event(void (*new_mouse_button_release)
+    (window *wnd, XButtonEvent &button_event)) {
+  mouse_button_release = new_mouse_button_release;
+}
+
+bool window::is_maximized() {
+  get_window_states();
+  return is_wnd_maximized_horz & is_wnd_maximized_vert;
+}
+
+bool window::is_maximized_vert() {
+  get_window_states();
+  return is_wnd_maximized_vert;
+}
+
+bool window::is_maximized_horz() {
+  get_window_states();
+  return is_wnd_maximized_horz;
+}
+
+bool window::is_fullscreen() {
+  return is_wnd_fullscreen;
+}
+
+bool window::is_running() {
+  return running;
+}
+
+void window::get_window_states() {
+  Atom type;
+  int format;
+  long unsigned item_number, bytes_after;
+  char unsigned *data = NULL;
+  
+  XGetWindowProperty(dpy, wnd, wm_state, 0, (~0L), 
+      false, AnyPropertyType, &type, &format, &item_number, 
+      &bytes_after, &data);
+  
+  is_wnd_fullscreen = false;  
+  is_wnd_maximized_horz = false;
+  is_wnd_maximized_vert = false;
+
+  for(int unsigned i = 0; i < item_number; ++i) {
+    int state = reinterpret_cast<long unsigned*>(data)[i]; 
+
+    if(state == FULL_SCREEN) { 
+      is_wnd_fullscreen = true;
+      continue;
+    }
+
+    if(state == MAXIMIZED_HORIZONTAL) {
+      is_wnd_maximized_horz = true; 
+      continue;
+    }
+
+    if(state == MAXIMIZED_VERTICAL)
+      is_wnd_maximized_vert = true;    
+  }
+  XFree(data);
+}
+
+void window::update() {
+  XWindowAttributes win;
+  XGetWindowAttributes(dpy, wnd, &win);
+  reshape(win.width, win.height);
+  if(swap_flag)  
+    glXSwapBuffers(dpy, glx_win); 
+}
+
+void window::run() {
+  gl_init();
+  XSetWMProtocols(dpy, wnd, &wm_delete_message, 1);
+  running = true;  
+  
+  while(running) {
+    XNextEvent(dpy, &event);
+    switch(event.type) {
+      case Expose:
+        update();               
+        break;
+      case ClientMessage: {
+        if((int unsigned)event.xclient.data.l[0] == 
+            wm_delete_message) {
+          running = false;
+          cleanup();  
+        }
+        break;
+      }
+      case KeyPress: {
+        key_press(this, event.xkey);
+        break;
+      }
+      case KeyRelease: {
+        key_release(this, event.xkey);
+        break;
+      }
+      case ButtonPress: {
+        mouse_button_press(this, event.xbutton); 
+        break;
+      }
+      case ButtonRelease: {
+        mouse_button_release(this, event.xbutton);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  XCloseDisplay(dpy);  
+}
