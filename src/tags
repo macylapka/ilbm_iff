@@ -1,0 +1,50 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+att	main.cpp	/^GLint att[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};$/;"	v
+button_press	main.cpp	/^void button_press(window *sender, XButtonEvent &event) {$/;"	f
+button_release	main.cpp	/^void button_release(window *sender, XButtonEvent &event) {$/;"	f
+clean	main.cpp	/^void clean() {$/;"	f
+cleanup	window.cpp	/^void window::cleanup() {$/;"	f	class:window
+close	window.cpp	/^void window::close() {$/;"	f	class:window
+display	main.cpp	/^void display() { $/;"	f
+event_queue	window.cpp	/^void window::event_queue() {$/;"	f	class:window
+fullscreen	window.cpp	/^void window::fullscreen() {$/;"	f	class:window
+get_color_map	window.cpp	/^Colormap window::get_color_map() {$/;"	f	class:window
+get_display	window.cpp	/^Display *window::get_display() {$/;"	f	class:window
+get_glx_context	window.cpp	/^GLXContext window::get_glx_context() {$/;"	f	class:window
+get_parent_window	window.cpp	/^Window window::get_parent_window() {$/;"	f	class:window
+get_window	window.cpp	/^Window window::get_window() {$/;"	f	class:window
+get_window_attributes	window.cpp	/^XSetWindowAttributes window::get_window_attributes() {$/;"	f	class:window
+get_window_states	window.cpp	/^void window::get_window_states() {$/;"	f	class:window
+gl_init	main.cpp	/^void gl_init() {$/;"	f
+glx_context	main.cpp	/^GLXContext glx_context;$/;"	v
+init_display	window.cpp	/^void window::init_display() {$/;"	f	class:window
+init_window	window.cpp	/^void window::init_window(XVisualInfo *visual_info) {$/;"	f	class:window
+is_fullscreen	window.cpp	/^bool window::is_fullscreen() {$/;"	f	class:window
+is_maximized	window.cpp	/^bool window::is_maximized() {$/;"	f	class:window
+is_maximized_horz	window.cpp	/^bool window::is_maximized_horz() {$/;"	f	class:window
+is_maximized_vert	window.cpp	/^bool window::is_maximized_vert() {$/;"	f	class:window
+is_running	window.cpp	/^bool window::is_running() {$/;"	f	class:window
+key_press	main.cpp	/^void key_press(window *sender, XKeyEvent &event) {$/;"	f
+key_release	main.cpp	/^void key_release(window *sender, XKeyEvent &event) {$/;"	f
+main	main.cpp	/^int main(int argc, char **argv) {$/;"	f
+maximize	window.cpp	/^void window::maximize() {$/;"	f	class:window
+minimize	window.cpp	/^void window::minimize() {$/;"	f	class:window
+normal	window.cpp	/^void window::normal() { $/;"	f	class:window
+reshape	main.cpp	/^void reshape(int w, int h) {$/;"	f
+run	window.cpp	/^void window::run() {$/;"	f	class:window
+set_key_press_event	window.cpp	/^void window::set_key_press_event(void (*new_key_press)$/;"	f	class:window
+set_key_release_event	window.cpp	/^void window::set_key_release_event(void (*new_key_release)$/;"	f	class:window
+set_mouse_button_press_event	window.cpp	/^void window::set_mouse_button_press_event(void (*new_mouse_button_press)$/;"	f	class:window
+set_mouse_button_release_event	window.cpp	/^void window::set_mouse_button_release_event(void (*new_mouse_button_release)$/;"	f	class:window
+set_reshape_event	window.cpp	/^void window::set_reshape_event(void (*new_reshape)(int, int)) {$/;"	f	class:window
+set_window_pos	window.cpp	/^void window::set_window_pos(int x, int y) {$/;"	f	class:window
+set_window_size	window.cpp	/^void window::set_window_size(int width, int height) {$/;"	f	class:window
+update	main.cpp	/^void update() {$/;"	f
+visual_info	main.cpp	/^XVisualInfo *visual_info;$/;"	v
+window	window.cpp	/^window::window(std::string title) {$/;"	f	class:window
+~window	window.cpp	/^window::~window() {$/;"	f	class:window
