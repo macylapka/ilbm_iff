@@ -1,0 +1,94 @@
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glx.h>
+#include <iostream>
+
+#define DEFAULT     0
+#define NORTH_WEST  1
+#define NORTH       2
+#define NORTH_EAST  3
+#define WEST        4
+#define CENTER      5
+#define EAST        6
+#define SOUTH_WEST  7
+#define SOUTH       8
+#define SOUTH_EAST  9
+#define STATIC      10
+
+#define X           (1 << 8)
+#define Y           (1 << 9)
+#define WIDTH       (1 << 10)
+#define HEIGHT      (1 << 11)
+
+class window {
+public:
+  virtual ~window();
+  window();
+  window(std::string title, int *a);
+ 
+  void fullscreen();
+  void maximize();
+  void minimize();
+  void normal();
+  void close();
+  void cleanup();
+ 
+  void run(); 
+  void init();
+
+  Display *get_display();
+  Window get_window();
+  Window get_parent_window();
+  XVisualInfo *get_visual_info();
+  XSetWindowAttributes get_window_attributes();
+  Colormap get_color_map();
+  GLXContext get_glx_context();
+
+  void set_window_size(int width, int height);
+  void set_window_pos(int x, int y);
+  void set_reshape_event(void (*)(int, int));
+  void set_key_press_event(void (*)(window*, XKeyEvent&));
+  void set_key_release_event(void (*)(window*, XKeyEvent&));
+  void set_mouse_button_press_event(void (*)(window*, XButtonEvent&));
+  void set_mouse_button_release_event(void (*)(window*, XButtonEvent&));
+
+  bool is_maximized();
+  bool is_maximized_vert();
+  bool is_maximized_horz();
+  bool is_fullscreen();
+protected: 
+  void get_window_states(); 
+  void expose();
+
+private:
+  Display *dpy;
+  Window parent_wnd;
+  Window wnd;
+  XVisualInfo *visual_info;
+  XSetWindowAttributes window_attributes;
+  Colormap color_map;
+  GLXContext glx_context;
+  XEvent event;
+  std::string title;
+  int *attributes;
+  bool is_maximized_horz;
+  bool is_maximized_vert;
+  bool is_fullscreen; 
+
+  Atom wm_change_state;
+  Atom wm_delete_message;
+  Atom wm_state; 
+  Atom wm_close_window;
+  Atom wm_maximize_window_horz;
+  Atom wm_maximize_window_vert;
+  Atom wm_fullscreen;
+  Atom wm_move_resize;
+  
+  void (*reshape)(int, int);
+  void (*key_press)(window*, XKeyEvent&);
+  void (*key_release)(window*, XKeyEvent&);
+  void (*mouse_button_press)(window*, XButtonEvent&);
+  void (*mouse_button_release)(window*, XButtonEvent&);
+};
