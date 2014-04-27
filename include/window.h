@@ -1,6 +1,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glx.h>
+#include <X11/extensions/xf86vmode.h>
 #include <string.h>
 #include <iostream>
 
@@ -52,6 +53,7 @@ public:
   Colormap       get_color_map();
   GLXFBConfig   *get_fb_configs();
   GLXContext     get_glx_context();  
+  void           get_display_resolutions();
 
   void set_gl_init(void (*)());
   void set_window_size(int width, int height);
