@@ -506,6 +506,19 @@ void window::get_window_states() {
   XFree(data);
 }
 
+void window::get_display_resolutions() {
+  
+  XF86VidModeModeInfo **modes;
+  int nr_modes;
+ 
+  XF86VidModeGetAllModeLines(dpy, DefaultScreen(dpy), &nr_modes, &modes);
+  for (int i = 0; i < nr_modes; ++i) {
+    printf("%dx%d\n", modes[i]->hdisplay, modes[i]->vdisplay);
+  }
+  XFree(modes);
+  return; 
+}
+
 void window::update() {
   XWindowAttributes win;
   XGetWindowAttributes(dpy, wnd, &win);
@@ -525,7 +538,8 @@ bool window::is_double_buffer(int *attr) {
 void window::run() {
   gl_init();
   XSetWMProtocols(dpy, wnd, &wm_delete_message, 1);
-  running = true;  
+  running = true;
+  get_display_resolutions(); 
   while(running) {
     XNextEvent(dpy, &event);
     switch(event.type) {
