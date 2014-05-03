@@ -19,10 +19,10 @@ SDIR=src
 #Shared
 SLDIR=/usr/lib
 
-HEADERS=window.h rle.h ilbm_iff.h
+HEADERS=window.h rle.h file_loader.h image.h ilbm_iff.h
 DEPS=$(patsubst %,$(IDIR)/%,$(HEADERS))
 
-OBJECTS= window.o main.o rle.o ilbm_iff.o
+OBJECTS= window.o rle.o file_loader.h image.o ilbm_iff.o main.o
 OBJ=$(patsubst %,$(ODIR)/%,$(OBJECTS))
 
 #quad.o: $(DEPS)
