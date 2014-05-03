@@ -1,8 +1,10 @@
 #ifndef ILBM_IFF_H
 #define ILBM_IFF_H 
 
+#include <image.h>
 #include <rle.h>
 #include <string>
+#include <memory>
 
 #define MASK_NONE                   0
 #define MASK_HAS_MASK               1
@@ -61,15 +63,26 @@ typedef struct {
   short pad;
 } cycle_info_type;
 
-class ilbm_iff {
+class ilbm_iff : public image {
 public:
   ~ilbm_iff();
   ilbm_iff();
   ilbm_iff(std::string&);
-  char unsigned ilbm_to_rgb();
-  char unsigned ilbm_to_rgba();
   
+  bool set_path_and_load(std::string&);
+  std::string get_path(); 
+
+  virtual char unsigned *convert_to_rgb();
+  virtual char unsigned *convert_to_rgba();
+  virtual int unsigned get_width();
+  virtual int unsigned get_height();
+  
+protected:
+  bool load();
+
 private:
+  
+  std::string path;
   /*
    * BMHD
    */
@@ -87,12 +100,12 @@ private:
    * CMAP
    */
   bool has_color_register;
-  color_register_type *color;
-  color_4_type        *color_4;  
+  std::unique_ptr<color_register_type> color;
+  std::unique_ptr<color_4_type>        color_4;  
 
- /*
-  * GRAB
-  */
+  /*
+   * GRAB
+   */
   bool has_grab; 
   point_2D_type point_2D;
   
@@ -118,7 +131,7 @@ private:
    * BODY
    */ 
   bool has_body;
-  char unsigned *body;
+  std::unique_ptr<char unsigned> body;
   
   /*
    * CRNG
