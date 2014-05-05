@@ -1,6 +1,6 @@
 #include <window.h>
+#include <ilbm_iff.h>
 #include <glog/logging.h>
-
 
 int single_buffer_attributes[] = {
     GLX_X_RENDERABLE,  True,
@@ -45,6 +45,11 @@ int main(int argc, char **argv) {
  
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;   
+
+  std::string path = "/home/macylapka/Projects/"
+    "opengl_x11.git/samples/pictures/Jetsons_rosie.ilbm";
+
+  ilbm_iff ilbm_image(path); 
 
   XInitThreads(); 
   window wnd("My window manager", double_buffer_attributes);
