@@ -79,13 +79,17 @@ public:
   
 protected:
   bool load();
-
+  void parse(char*, int unsigned);
+  
 private:
   
   std::string path;
+  int unsigned ilbm_size;
+
   /*
    * BMHD
    */
+  bool has_ilbm;
   short unsigned w, h;
   short x, y;
   char unsigned n_planes;
@@ -131,7 +135,7 @@ private:
    * BODY
    */ 
   bool has_body;
-  std::unique_ptr<char unsigned> body;
+  std::unique_ptr<char[]> body;
   
   /*
    * CRNG

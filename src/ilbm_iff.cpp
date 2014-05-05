@@ -1,11 +1,17 @@
 #include <ilbm_iff.h>
 #include <file_loader.h>
+#include <iostream>
 
 ilbm_iff::~ilbm_iff() {
 
 }
 
 ilbm_iff::ilbm_iff() {
+ 
+  path = "";
+  ilbm_size = 0;
+ 
+  has_ilbm = false;
   w = h = x = y = 0;
   n_planes = 0;
   masking = 0;
@@ -89,7 +95,20 @@ int unsigned ilbm_iff::get_height() {
 }
 
 bool ilbm_iff::load() {
-   
+
+  int unsigned length = 0;
+  body = file_loader::get_data(path, length);
+  std::cout << "loaded: " << length << " bytes" << std::endl;
+  parse(body.get(), length);
   return true;
 }
 
+void ilbm_iff::parse(char *data, int unsigned length) {
+  
+  int unsigned position = 0;
+  
+  //while(position < length) {
+      
+  //} 
+
+}
