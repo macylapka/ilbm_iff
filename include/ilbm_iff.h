@@ -5,6 +5,7 @@
 #include <rle.h>
 #include <string>
 #include <memory>
+#include <utils.h>
 
 #define MASK_NONE                   0
 #define MASK_HAS_MASK               1
@@ -19,6 +20,19 @@
 
 #define RNG_ACTIVE  1
 #define RNG_REVERSE 2
+
+std::string const FORM = "FORM";
+std::string const ILBM = "ILBM";
+std::string const BMHD = "BMHD";
+std::string const ANNO = "ANNO";
+std::string const CMAP = "CMAP";
+std::string const GRAB = "GRAB";
+std::string const DEST = "DEST";
+std::string const SPRT = "SPRT";
+std::string const CAMG = "CAMG";
+std::string const BODY = "BODY";
+std::string const CRNG = "CRNG";
+std::string const CCRT = "CCRT";
 
 typedef struct {
   char unsigned red;
@@ -65,6 +79,7 @@ typedef struct {
 
 class ilbm_iff : public image {
 public:
+
   ~ilbm_iff();
   ilbm_iff();
   ilbm_iff(std::string&);
@@ -78,12 +93,20 @@ public:
   virtual int unsigned get_height();
   
 protected:
+
   bool load();
   void parse(char*, int unsigned);
-  
+  std::string get_data_as_string(char*, int unsigned, 
+    int unsigned);  
+   
 private:
   
   std::string path;
+
+  /*
+   * FORM
+   */
+  bool has_form;
   int unsigned ilbm_size;
 
   /*
@@ -99,7 +122,13 @@ private:
   short transparent_color;
   char unsigned x_aspect, y_aspect;
   short page_width, page_height;
-  
+
+  /*
+   * ANNO
+   */    
+  bool has_anno;
+  std::string annotation;
+
   /*
    * CMAP
    */

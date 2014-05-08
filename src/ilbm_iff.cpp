@@ -9,6 +9,8 @@ ilbm_iff::~ilbm_iff() {
 ilbm_iff::ilbm_iff() {
  
   path = "";
+  
+  has_form = false;
   ilbm_size = 0;
  
   has_ilbm = false;
@@ -20,6 +22,9 @@ ilbm_iff::ilbm_iff() {
   transparent_color = 0;
   x_aspect = y_aspect = 0;
   page_width = page_height = 0;
+
+  has_anno = false;
+  annotation = "";
 
   has_color_register = false;
   color = nullptr;
@@ -98,17 +103,66 @@ bool ilbm_iff::load() {
 
   int unsigned length = 0;
   body = file_loader::get_data(path, length);
+
+#ifdef DEBUG
   std::cout << "loaded: " << length << " bytes" << std::endl;
+#endif
+
   parse(body.get(), length);
   return true;
 }
 
-void ilbm_iff::parse(char *data, int unsigned length) {
+void ilbm_iff::parse(char *data, int unsigned len) {
   
-  int unsigned position = 0;
-  
-  //while(position < length) {
-      
-  //} 
+  char byte;
+  int unsigned pos = 0; 
+  std::string section_name = "";
 
+  while(pos < len) {
+    section_name = get_data_as_string(data, pos, len);
+      if(section_name == FORM) {
+        std::cout << section_name << std::endl;
+      } else if(section_name == ILBM) {
+        std::cout << section_name << std::endl;       
+      } else if(section_name == BMHD) {
+        std::cout << section_name << std::endl;     
+      } else if(section_name == ANNO) {
+        std::cout << section_name << std::endl;
+      } else if(section_name == CMAP) { 
+        std::cout << section_name << std::endl;     
+      } else if(section_name == GRAB) {
+        std::cout << section_name << std::endl;
+      } else if(section_name == DEST) {
+        std::cout << section_name << std::endl;     
+      } else if(section_name == SPRT) {
+        std::cout << section_name << std::endl;     
+      } else if(section_name == CAMG) {
+        std::cout << section_name << std::endl;
+      } else if(section_name == BODY) {
+        std::cout << section_name << std::endl;     
+      } else if(section_name == CRNG) {
+        std::cout << section_name << std::endl;
+      } else if(section_name == CCRT) {
+        std::cout << section_name << std::endl;     
+      }
+    ++pos;
+  }  
+}
+
+std::string ilbm_iff::get_data_as_string(char *data, 
+  int unsigned pos, int unsigned len) {
+
+  if(pos >= len - 4)
+    return "";  
+
+  if(data[pos] < 'A' || data[pos] > 'Z')
+    return "";
+
+  std::string section_name = ""; 
+  section_name += data[pos];
+  section_name += data[pos + 1];
+  section_name += data[pos + 2];
+  section_name += data[pos + 3];
+
+  return section_name;
 }
