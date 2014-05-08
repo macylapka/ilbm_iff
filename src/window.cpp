@@ -1,5 +1,4 @@
 #include <window.h>
-#define DEBUG 
 
 bool window::ctx_error_ocurred = false;
 
