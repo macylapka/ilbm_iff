@@ -18,18 +18,20 @@ ODIR=obj
 SDIR=src
 #Shared
 SLDIR=/usr/lib
+#Options
+OPT=-DDEBUG
 
-HEADERS=window.h rle.h file_loader.h image.h ilbm_iff.h
+HEADERS=window.h rle.h file_loader.h image.h utils.h ilbm_iff.h
 DEPS=$(patsubst %,$(IDIR)/%,$(HEADERS))
 
-OBJECTS= window.o rle.o file_loader.h image.o ilbm_iff.o main.o
+OBJECTS= window.o rle.o file_loader.h image.o utils.o ilbm_iff.o main.o
 OBJ=$(patsubst %,$(ODIR)/%,$(OBJECTS))
 
 #quad.o: $(DEPS)
 #	$(CC) $(STD) -c -o $(ODIR)/%.o $< $(CFLAGS)
 
 quad: $(SDIR)/*.cpp
-	$(CC) $(STD) -I$(IDIR) -o $@ $^ $(CFLAGS)$(LIBS)
+	$(CC) $(STD) $(OPT) -I$(IDIR) -o $@ $^ $(CFLAGS)$(LIBS)
 
 .PHONY: clean
 
