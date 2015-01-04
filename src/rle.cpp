@@ -1,120 +1,35 @@
 #include <rle.h>
 
-int unsigned run_length_encoding::array_length = increase_size;
-
-bool run_length_encoding::decode(char *encoded, 
-  int unsigned &encoded_length, char *decoded, 
-  int unsigned &decoded_length) {
+std::unique_ptr<char unsigned[]> run_length_encoding::decode(
+  std::unique_ptr<char unsigned[]> enc, 
+  int unsigned &len) {
   
-  if(encoded_length == 0)
-    return false; 
+  std::vector<char unsigned> dec_data;
+ 
+  int unsigned pos = 0; 
+  char *p_data = (char*)enc.get();
   
-  int unsigned encoded_position = 0;
-  int unsigned decoded_position = 0; 
-  char *data = new char[array_length];
-  
-  while(encoded_position < encoded_length) {
-    if(encoded[encoded_position] >= 0) {
-      char number = encoded[encoded_position] + 1;
-      ++encoded_position;
-      
-      // sprawdzamy czy się zmiesci jak się nie popiesci
-      if(decoded_position + number >= array_length) 
-        // jezeli nie da się zwiększyć nawet pieszczac to sorry 
-        if(!increase_array_size(&data, array_length, increase_size)) {
-          delete []data;
-          return false;
-        }
-      
-      // kopiujemy n + 1 bajtów tak jak jest 
-      memcpy(encoded, encoded_position, data, decoded_position, number);
-      
-      decoded_position += number;
-      encoded_position += number; 
-             
-    } else if(encoded[encoded_position] >= -127 &&
-              encoded[encoded_position] <= -1) { 
-      char unsigned number = -encoded[encoded_position] + 1;
-      ++encoded_position;
-      
-      // sprawdzamy czy się zmiesci jak się nie popiesci
-      if(decoded_position + number >= array_length) 
-        // jezeli nie da się zwiększyć nawet pieszczac to sorry 
-        if(!increase_array_size(&data, array_length, increase_size)) {
-          delete []data;
-          return false;
-        }
-
-      // powielamy bajt -n+1 razy
-      char byte = encoded[decoded_position];  
-      memdup(data, decoded_position, byte, number);
-
-      decoded_position += number; 
-      ++encoded_position;
- 
-    } else if(encoded[encoded_position] == -128) {
-      // nie robimy nic
-
-    } else {
-      // tu nie powinnismy wejsć
-    
-    }
-  }
- 
-  return true;
-}
-
-int run_length_encoding::increase_array_size(
-  char **input_array, int unsigned length, 
-  int unsigned size) {
-  // zwiekszamy liczbe elementów w tablicy
-  int new_array_size = length + size;
-
-  // tworzymy tablice z powiekszona liczba elementow
-  char *tmp = new char[new_array_size];
- 
-  // kopiujemy stara tablice do nowej
-  for(int unsigned i = 0; i < length; ++i) {
-    tmp[i] = (*input_array)[i];
+  while(pos < len) {
+    if(p_data[pos] >= 0) {
+      for(int j = 0; j < p_data[pos] + 1; ++j)
+        dec_data.push_back(p_data[pos + j + 1]); 
+      pos += p_data[pos] + 2;
+    } else if(p_data[pos] >= -127 && p_data[pos] <= -1) {
+      for(int j = 0; j < (-p_data[pos] + 1); ++j) 
+        dec_data.push_back(-p_data[pos + 1]);
+      pos += 2; 
+    } else if(p_data[pos] == -128) {
+      ++pos; 
+    } 
   }
   
-  // usuwamy starą tablice
-  delete [](*input_array);
+  //data.reserve(len);
+  //std::copy(enc.get(), enc.get() + len, data.begin()); 
+  len = dec_data.size();
+  std::unique_ptr<char unsigned[]> result(new char unsigned[len]);
+  std::copy(dec_data.begin(), dec_data.end(), result.get());
 
-  // niech nasza nowa tablica zastapi starą
-  (*input_array) = tmp;
-
-  // zwrócmy ilość elementów nowej tablicy
-  return new_array_size;
+  return std::move(result);
 }
 
-bool run_length_encoding::memdup(
-  char *array, 
-  int unsigned position,
-  char byte,
-  int unsigned times) {
-  
-  if(times <= 0)
-    return false;
 
-  for (int unsigned i = 0; i < times; ++i)
-      array[position + i] = byte;
-
-  return true;
-}
-
-bool run_length_encoding::memcpy(
-  char *src_array,
-  int unsigned src_pos,
-  char *dest_array,
-  int unsigned dest_pos,
-  int unsigned number) {
-  
-  if(number <= 0)
-    return false;
-
-  for(int unsigned i = 0; i < number; ++i)
-    dest_array[src_pos + i] = src_array[dest_pos + i];
-
-  return true;
-}

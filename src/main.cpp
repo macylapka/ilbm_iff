@@ -31,6 +31,10 @@ int double_buffer_attributes[] = {
     None
 };
 
+std::string path = "/home/macylapka/Projects/"
+    "opengl_x11.git/samples/pictures/Jetsons_rosie.ilbm";
+ilbm_iff ilbm_image(path);
+
 void clean();
 void update();
 void gl_init();
@@ -44,15 +48,10 @@ void button_release(window*, XButtonEvent&);
 int main(int argc, char **argv) {
  
   google::InitGoogleLogging(argv[0]);
-  FLAGS_logtostderr = 1;   
-
-  std::string path = "/home/macylapka/Projects/"
-    "opengl_x11.git/samples/pictures/Jetsons_rosie.ilbm";
-
-  ilbm_iff ilbm_image(path); 
+  FLAGS_logtostderr = 1;    
 
   XInitThreads(); 
-  window wnd("My window manager", double_buffer_attributes);
+  window wnd("My window manager", single_buffer_attributes);
   try {
     wnd.init();
   } catch (char const *msg) {
@@ -69,32 +68,47 @@ int main(int argc, char **argv) {
 }
 
 void gl_init() {
-  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClearColor(0.0, 0.0, 0.0, 0.0);
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(-1., 1., -1., 1., 1., 20.);
+  glOrtho(-320., 320., -256., 256., 0., 20.);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(0., 0., 10., 0., 0., 0., 0., 1., 0.);
     
-  glEnable(GL_DEPTH_TEST); 
+  glEnable(GL_DEPTH_TEST);
+
+  GLuint texid; 
+  glGenTextures(1, &texid); 
+  glBindTexture(GL_TEXTURE_2D, texid);
+  glPixelStorei(GL_PACK_ALIGNMENT, 8); 
+  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+    ilbm_image.get_width(), ilbm_image.get_height(), 0,
+    GL_RGB, GL_UNSIGNED_BYTE, ilbm_image.convert_to_rgb()); 
 }
 
 void display() { 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_TEXTURE_2D);
   glBegin(GL_QUADS);
-    glColor3f(1., 0., 0.);
-    glVertex3f(-.75, -.75, 0.);
-    glColor3f(0., 1., 0.);
-    glVertex3f(.75, -.75, 0.);
-    glColor3f(0., 0., 1.);
-    glVertex3f(-.75, -.75, 0.);
-    glColor3f(1., 1., 0.);
-    glVertex3f(-.75, .75, 0.);
+    glTexCoord2f(0, 0); 
+    glVertex3f(-320.0, 256.0, .0);
+    glTexCoord2f(0, 1); 
+    glVertex3f(320.0, 256.0, .0);
+    glTexCoord2f(1, 1); 
+    glVertex3f(320.0, -256.0, .0);
+    glTexCoord2f(1, 0); 
+    glVertex3f(-320.0, -256.0, .0);
   glEnd();
+  glRotatef(180.0f, 0.f, 0.f, 1.f);
+  glScalef(1.0f, 1.0f, -10.0f); 
   glFlush();
+  glDisable(GL_TEXTURE_2D);
 }
 
 void reshape(int w, int h) {
@@ -125,7 +139,7 @@ void key_press(window *sender, XKeyEvent &event) {
       break;
     }
     case 0x0E: {
-      sender->set_window_size(1024, 768);
+      sender->set_window_size(640, 512);
       break;
     }
     case 0x0F: {

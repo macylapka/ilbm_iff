@@ -269,7 +269,7 @@ void window::init() {
 #ifdef DEBUG
   std::cout << "Creating window: ";
 #endif
-  wnd = XCreateWindow(dpy, RootWindow(dpy, visual_info->screen), 0, 0, 640, 480, 0, 
+  wnd = XCreateWindow(dpy, RootWindow(dpy, visual_info->screen), 0, 0, 640, 512, 0, 
     visual_info->depth, InputOutput, visual_info->visual, 
     swa_mask, &set_wnd_attr);
 #ifdef DEBUG

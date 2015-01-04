@@ -21,18 +21,37 @@
 #define RNG_ACTIVE  1
 #define RNG_REVERSE 2
 
-std::string const FORM = "FORM";
-std::string const ILBM = "ILBM";
-std::string const BMHD = "BMHD";
-std::string const ANNO = "ANNO";
-std::string const CMAP = "CMAP";
-std::string const GRAB = "GRAB";
-std::string const DEST = "DEST";
-std::string const SPRT = "SPRT";
-std::string const CAMG = "CAMG";
-std::string const BODY = "BODY";
-std::string const CRNG = "CRNG";
-std::string const CCRT = "CCRT";
+#define FORM 0x464F524D 
+#define ILBM 0x494C424D
+#define BMHD 0x424D4844
+#define ANNO 0x414E4E4F
+#define DPI  0x44504920
+#define CMAP 0x434D4150
+#define GRAB 0x47524142
+#define DEST 0x44455354
+#define SPRT 0x53505254
+#define CAMG 0x43414D47
+#define BODY 0x424F4459
+#define CRNG 0x43524E47
+#define CCRT 0x43435254
+
+#define SECTION_LENGTH 4
+#define SIZE_LENGTH 4
+#define BYTE_LENGTH 1
+#define WORD_LENGTH 2
+#define DWORD_LENGTH 4
+
+typedef struct {
+  short unsigned w, h;
+  short x, y;
+  char unsigned n_planes;
+  char unsigned masking;
+  char unsigned compression;
+  char unsigned pad1;
+  short transparent_color;
+  char unsigned x_aspect, y_aspect;
+  short page_width, page_height;
+} bmhd_type;
 
 typedef struct {
   char unsigned red;
@@ -89,16 +108,31 @@ public:
 
   virtual char unsigned *convert_to_rgb();
   virtual char unsigned *convert_to_rgba();
+  virtual char unsigned *convert_to_bgr();
+  virtual char unsigned *convert_to_bgra();
   virtual int unsigned get_width();
   virtual int unsigned get_height();
-  
+
 protected:
 
   bool load();
-  void parse(char*, int unsigned);
-  std::string get_data_as_string(char*, int unsigned, 
-    int unsigned);  
-   
+  void parse(char unsigned*, int unsigned); 
+  int parse_form(char unsigned*, int unsigned, int unsigned);
+  int parse_ilbm(char unsigned*, int unsigned, int unsigned);
+  int parse_bmhd(char unsigned*, int unsigned, int unsigned);
+  int parse_anno(char unsigned*, int unsigned, int unsigned);
+  int parse_dpi(char unsigned*, int unsigned, int unsigned);
+  int parse_cmap(char unsigned*, int unsigned, int unsigned);
+  int parse_grab(char unsigned*, int unsigned, int unsigned);
+  int parse_dest(char unsigned*, int unsigned, int unsigned);
+  int parse_sprt(char unsigned*, int unsigned, int unsigned);
+  int parse_camg(char unsigned*, int unsigned, int unsigned);
+  int parse_body(char unsigned*, int unsigned, int unsigned);
+  int parse_crng(char unsigned*, int unsigned, int unsigned);
+  int parse_ccrt(char unsigned*, int unsigned, int unsigned);
+  char unsigned string_bytes(char unsigned*, char unsigned,
+    char unsigned);
+
 private:
   
   std::string path;
@@ -107,21 +141,13 @@ private:
    * FORM
    */
   bool has_form;
-  int unsigned ilbm_size;
+  int unsigned size;
 
   /*
    * BMHD
    */
-  bool has_ilbm;
-  short unsigned w, h;
-  short x, y;
-  char unsigned n_planes;
-  char unsigned masking;
-  char unsigned compression;
-  char unsigned pad1;
-  short transparent_color;
-  char unsigned x_aspect, y_aspect;
-  short page_width, page_height;
+  bool has_bmhd;
+  bmhd_type bmhd; 
 
   /*
    * ANNO
@@ -130,11 +156,19 @@ private:
   std::string annotation;
 
   /*
+   * DPI
+   */
+  bool has_dpi;
+  short dpi_w;
+  short dpi_h;
+
+  /*
    * CMAP
    */
   bool has_color_register;
-  std::unique_ptr<color_register_type> color;
-  std::unique_ptr<color_4_type>        color_4;  
+  int color_size;
+  std::unique_ptr<color_register_type[]> color;
+  std::unique_ptr<color_4_type[]>        color_4;  
 
   /*
    * GRAB
@@ -164,8 +198,9 @@ private:
    * BODY
    */ 
   bool has_body;
-  std::unique_ptr<char[]> body;
-  
+  std::unique_ptr<char unsigned[]> body;
+  int unsigned body_size;
+
   /*
    * CRNG
    */
