@@ -1,4 +1,6 @@
 #include <window.h>
+#include <stdexcept>
+#include <glog/logging.h>
 
 bool window::ctx_error_ocurred = false;
 
@@ -9,7 +11,8 @@ int window::ctx_error_handler(Display *dpy, XErrorEvent *ev) {
 
 static bool isExtensionSupported(const char *extList, const char *extension) {
   const char *start;
-  const char *where, *terminator;
+  const char *where;
+  const char *terminator;
  
   /* Extension names should not have spaces. */
   where = strchr(extension, ' ');
@@ -43,26 +46,27 @@ window::~window() {
 }
 
 window::window(std::string new_title, int *new_attributes) {
-  running = false;
-  swap_flag = false;  
-  this->title = new_title;
+  running               = false;
+  swap_flag             = false;  
+  this->title           = new_title;
   is_wnd_maximized_horz = false;
   is_wnd_maximized_vert = false;
-  is_wnd_fullscreen = false;
-  dpy = NULL;
-  visual_info = NULL;
-  attributes = new_attributes;
+  is_wnd_fullscreen     = false;
+  dpy                   = NULL;
+  visual_info           = NULL;
+  attributes            = new_attributes;
 }
 
 void window::fullscreen() {
   XEvent wnd_event; 
-  wnd_event.type = ClientMessage;
-  wnd_event.xclient.window = wnd;
+  wnd_event.type                 = ClientMessage;
+  wnd_event.xclient.window       = wnd;
   wnd_event.xclient.message_type = wm_state;
-  wnd_event.xclient.format = 32;
-  wnd_event.xclient.data.l[0] = 1;
-  wnd_event.xclient.data.l[1] = wm_fullscreen;
-  wnd_event.xclient.data.l[2] = 0;
+  wnd_event.xclient.format       = 32;
+  wnd_event.xclient.data.l[0]    = 1;
+  wnd_event.xclient.data.l[1]    = wm_fullscreen;
+  wnd_event.xclient.data.l[2]    = 0;
+
   XSendEvent(dpy, DefaultRootWindow(dpy), False, 
     SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
 }
@@ -71,69 +75,94 @@ void window::maximize() {
   get_window_states();
   
   XEvent wnd_event;
-  wnd_event.type = ClientMessage;
-  wnd_event.xclient.window = wnd;
+  wnd_event.type                 = ClientMessage;
+  wnd_event.xclient.window       = wnd;
   wnd_event.xclient.message_type = wm_state;
-  wnd_event.xclient.format = 32;
+  wnd_event.xclient.format       = 32;
+
   if(is_wnd_fullscreen) {
       wnd_event.xclient.data.l[0] = 0;
       wnd_event.xclient.data.l[1] = wm_fullscreen;
       wnd_event.xclient.data.l[2] = 0; 
-  } 
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
+  }
+
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event);
   
-  wnd_event.type = ClientMessage;
-  wnd_event.xclient.window = wnd;
+  wnd_event.type                 = ClientMessage;
+  wnd_event.xclient.window       = wnd;
   wnd_event.xclient.message_type = wm_state;
-  wnd_event.xclient.format = 32;
+  wnd_event.xclient.format       = 32;
   // _NET_WM_STATE_REMOVE   0   // remove/unset property
   // _NET_WM_STATE_ADD      1   // add/set property
   // _NET_WM_STATE_TOGGLE   2   // toggle property
   wnd_event.xclient.data.l[0] = 1;
   wnd_event.xclient.data.l[1] = wm_maximize_window_horz;
   wnd_event.xclient.data.l[2] = wm_maximize_window_vert;
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-    SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);  
+  
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event);  
 }
 
 void window::minimize() {
   XEvent wnd_event;
-  wnd_event.type = ClientMessage;
-  wnd_event.xclient.window = wnd;
+  wnd_event.type                 = ClientMessage;
+  wnd_event.xclient.window       = wnd;
   wnd_event.xclient.message_type = wm_change_state;
-  wnd_event.xclient.format = 32;
+  wnd_event.xclient.format       = 32;
   //WITHDRAWN_STATE   0
   //NORMAL_STATE      1
   //ICONIC_STATE      3
-  wnd_event.xclient.data.l[0] = 3; 
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-    SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event); 
+  wnd_event.xclient.data.l[0]    = 3;
+
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event); 
 }
 
 void window::normal() { 
   get_window_states();
   XEvent wnd_event;
-  wnd_event.type = ClientMessage;
-  wnd_event.xclient.window = wnd;
+  wnd_event.type                 = ClientMessage;
+  wnd_event.xclient.window       = wnd;
   wnd_event.xclient.message_type = wm_state;
-  wnd_event.xclient.format = 32;
+  wnd_event.xclient.format       = 32;
+
+
   if(is_wnd_fullscreen) {
       wnd_event.xclient.data.l[0] = 0;
       wnd_event.xclient.data.l[1] = wm_fullscreen;
       wnd_event.xclient.data.l[2] = 0; 
   } 
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event); 
   
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event); 
+  
+
   if(is_wnd_maximized_horz) {
       wnd_event.xclient.data.l[0] = 0;
       wnd_event.xclient.data.l[1] = wm_maximize_window_horz;
       wnd_event.xclient.data.l[2] = 0;
       wnd_event.xclient.data.l[3] = 0; 
-  }      
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);   
+  }
+
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event);   
+
 
   if(is_wnd_maximized_vert) {
       wnd_event.xclient.data.l[0] = 0;
@@ -141,9 +170,12 @@ void window::normal() {
       wnd_event.xclient.data.l[2] = 0;
       wnd_event.xclient.data.l[3] = 0; 
   }      
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, 
-      SubstructureRedirectMask | SubstructureNotifyMask, &wnd_event);
 
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event);
 }
 
 void window::close() {
@@ -154,8 +186,12 @@ void window::close() {
   wnd_event.xclient.format = 32;
   wnd_event.xclient.data.l[0] = CurrentTime;
   wnd_event.xclient.data.l[1] = 1;
-  XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | 
-    SubstructureNotifyMask, &wnd_event);
+  
+  XSendEvent(dpy, 
+             DefaultRootWindow(dpy), 
+             False, 
+             SubstructureRedirectMask | SubstructureNotifyMask, 
+             &wnd_event);
 }
 
 void window::cleanup() {
@@ -170,46 +206,42 @@ void window::cleanup() {
 void window::init() {
   dpy = XOpenDisplay(NULL);
   if(!dpy) {
-    throw "Faild to open X display";
+    throw std::runtime_error("Faild to open X display");
   }
 
-  wm_change_state = XInternAtom(dpy, "WM_CHANGE_STATE", False);
-  wm_delete_message = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-  wm_state = XInternAtom(dpy, "_NET_WM_STATE", False); 
-  wm_close_window = XInternAtom(dpy, "_NET_CLOSE_WINDOW", False); 
-  wm_maximize_window_horz = XInternAtom(dpy, 
-    "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-  wm_maximize_window_vert = XInternAtom(dpy,
-    "_NET_WM_STATE_MAXIMIZED_VERT", False);
-  wm_fullscreen = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
-  wm_move_resize = XInternAtom(dpy, "_NET_MOVERESIZE_WINDOW", False);  
+  wm_change_state         = XInternAtom(dpy, "WM_CHANGE_STATE", False);
+  wm_delete_message       = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+  wm_state                = XInternAtom(dpy, "_NET_WM_STATE", False); 
+  wm_close_window         = XInternAtom(dpy, "_NET_CLOSE_WINDOW", False); 
+  wm_maximize_window_horz = XInternAtom(dpy, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+  wm_maximize_window_vert = XInternAtom(dpy, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+  wm_fullscreen           = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
+  wm_move_resize          = XInternAtom(dpy, "_NET_MOVERESIZE_WINDOW", False);  
 
   
   if(!glXQueryVersion(dpy, &glx_major, &glx_minor) || 
       ((glx_major == 1) && (glx_minor < 3)) || (glx_major < 1)) {
-    throw "Invalid GLX version";
+    throw std::runtime_error("Invalid GLX version");
   }
+
 #ifdef DEBUG
-  std::cout << "glx version = " << glx_major << "." << glx_minor << std::endl;
+  LOG(INFO) << "glx version = " << glx_major << "." << glx_minor << std::endl;
 #endif
 
   int fb_number; 
   fb_configs = glXChooseFBConfig(dpy, DefaultScreen(dpy), attributes, &fb_number);
   if(!fb_configs) {
-    throw "Faild to retrieve a framebuffer config";
+    throw std::runtime_error("Faild to retrieve a framebuffer config");
   }
 
-#ifdef DEBUG
-    std::cout << "Double buffer: ";
-#endif
   if(is_double_buffer(attributes)) {
     swap_flag = true;
   }
+
 #ifdef DEBUG
-  std::cout << std::boolalpha << swap_flag
-    << std::dec << std::endl; 
-  std::cout << "Found " << fb_number << " matching FB configs" << std::endl;
-  std::cout << "Getting XVisualInfos" << std::endl;
+  LOG(INFO) << "Double buffer: " << std::boolalpha << swap_flag << std::dec << std::endl;
+  LOG(INFO) << "Found " << fb_number << " matching FB configs" << std::endl;
+  LOG(INFO) << "Getting XVisualInfos" << std::endl;
 #endif
 
   int best_fb_config = -1, worst_fb_config = -1, best_num_samp = -1,
@@ -223,9 +255,9 @@ void window::init() {
       glXGetFBConfigAttrib(dpy, fb_configs[i], GLX_SAMPLES, &samples);
 
 #ifdef DEBUG
-      std::cout << "  Matching fb_config " << i << " visual ID 0x" << std::hex << vi->visualid
-        << std::dec << ": SAMPLE_BUFFERS = " << samp_buf << ", SAMPLES = " << samples 
-        << std::endl;
+  LOG(INFO) << "  Matching fb_config " << i << " visual ID 0x" << std::hex << vi->visualid
+            << std::dec << ": SAMPLE_BUFFERS = " << samp_buf << ", SAMPLES = " << samples 
+            << std::endl;
 #endif
 
       if((best_fb_config < 0 || samp_buf) && samples > best_num_samp && swap_flag)
@@ -247,48 +279,43 @@ void window::init() {
   visual_info = glXGetVisualFromFBConfig(dpy, best_fbc);
   
 #ifdef DEBUG
-  std::cout << "Chosen visual ID 0x" << std::hex << visual_info->visualid 
-    << std::dec << std::endl;
+  LOG(INFO) << "Chosen visual ID 0x" << std::hex << visual_info->visualid 
+            << std::dec << std::endl;
 #endif
+
   XSetWindowAttributes set_wnd_attr;
   set_wnd_attr.background_pixmap = None;
   set_wnd_attr.border_pixel = 0;
   set_wnd_attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | 
     ButtonPressMask | ButtonReleaseMask | ConfigureNotify | StructureNotifyMask;
-#ifdef DEBUG
-  std::cout << "Creating colormap: ";
-#endif
+
   set_wnd_attr.colormap = color_map = XCreateColormap(dpy, 
     RootWindow(dpy, visual_info->screen), visual_info->visual, AllocNone);
+
 #ifdef DEBUG 
-  std::cout << "OK" << std::endl;
+  LOG(INFO) << "Creating colormap: " << "OK" << std::endl;
 #endif
  
   int swa_mask = CWBorderPixel | CWColormap | CWEventMask;
 
-#ifdef DEBUG
-  std::cout << "Creating window: ";
-#endif
   wnd = XCreateWindow(dpy, RootWindow(dpy, visual_info->screen), 0, 0, 640, 512, 0, 
     visual_info->depth, InputOutput, visual_info->visual, 
     swa_mask, &set_wnd_attr);
-#ifdef DEBUG
-  std::cout << "OK" << std::endl;
-#endif
 
   if(!wnd) {
-    throw "Failed to create window";
+    throw std::runtime_error("Failed to create window");
   }
-  XFree(visual_info);
-
-  XStoreName(dpy, wnd, "GL 3.0 Window");
 
 #ifdef DEBUG
-  std::cout << "Mapping window: ";
+  LOG(INFO) << "Creating window: OK" << std::endl;
 #endif
+
+  XFree(visual_info);
+  XStoreName(dpy, wnd, "GL 3.0 Window");
   XMapWindow(dpy, wnd);
+
 #ifdef DEBUG
-  std::cout << "OK" << std::endl;
+  LOG(INFO) << "Mapping window: OK" << std::endl;
 #endif
 
   char const *glx_exts = glXQueryExtensionsString(dpy, DefaultScreen(dpy)); 
@@ -303,38 +330,37 @@ void window::init() {
     XSetErrorHandler(&window::ctx_error_handler);
 
   if(!isExtensionSupported(glx_exts, "GLX_ARB_create_context") ||
-    !glXCreateContextAttribsARB) {
+     !glXCreateContextAttribsARB) {
+
 #ifdef DEBUG 
-    std::cout << "glXCreateContextAttribsARB() not found"
-      << "... using old-style GLX context" << std::endl;
+  LOG(INFO) << "glXCreateContextAttribsARB() not found" << "... using old-style GLX context" << std::endl;
 #endif
-    glx_context = glXCreateNewContext(dpy, best_fbc, GLX_RGBA_TYPE, NULL, True);
+
+     glx_context = glXCreateNewContext(dpy, best_fbc, GLX_RGBA_TYPE, NULL, True);
   } else {
     int context_attribs[] = {
       GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
       GLX_CONTEXT_MINOR_VERSION_ARB, 0,
       None
     };
-#ifdef DEBUG
-    std::cout << "Creating context: ";
-#endif
+
     glx_context = glXCreateContextAttribsARB(dpy, best_fbc, NULL, True, context_attribs);
-#ifdef DEBUG
-    std::cout << "OK" << std::endl;
-#endif
 
     XSync(dpy, False);
     if(!ctx_error_ocurred && glx_context) {
+
 #ifdef DEBUG
-      std::cout << "Created GL 3.0 context" << std::endl;
+      LOG(INFO) << "Created GL 3.0 context" << std::endl;
 #endif
+
     } else {
       context_attribs[1] = 1;
       context_attribs[3] = 0;
       ctx_error_ocurred = false; 
+
 #ifdef DEBUG
-      std::cout << "Failed to create GL 3.0 context"
-        << "... using old-style GLX context" << std::endl;
+      LOG(INFO) << "Failed to create GL 3.0 context"
+                << "... using old-style GLX context" << std::endl;
 #endif
       glx_context = glXCreateContextAttribsARB(dpy, best_fbc, NULL, True, context_attribs);  
     } 
@@ -344,31 +370,25 @@ void window::init() {
   XSetErrorHandler(old_handler);
 
   if(ctx_error_ocurred || !glx_context) {
-    throw "Faild to create an OpenGL context";
+    throw std::runtime_error("Faild to create an OpenGL context");
   }
-
-#ifdef DEBUG
-    std::cout << "GLX rendering context obtained: ";
-#endif
 
   if(glXIsDirect(dpy, glx_context)) {
 #ifdef DEBUG
-    std::cout << "Indirect" << std::endl;
+    LOG(INFO) << "GLX rendering context obtained: " << "Indirect" << std::endl;
 #endif
   } else {
 #ifdef DEBUG
-    std::cout << "Direct" << std::endl;
+    LOG(INFO) << "GLX rendering context obtained: " << "Direct" << std::endl;
 #endif 
   }
 
-#ifdef DEBUG 
-  std::cout << "Making context current: ";
-#endif
   glXMakeCurrent(dpy, wnd, glx_context);
+
 #ifdef DEBUG
-  std::cout << "OK" << std::endl;
-  std::cout << "Error ocurre: " << std::boolalpha << (glGetError() != GL_NO_ERROR) 
-    << std::dec << std::endl;
+  LOG(INFO) << "Making context current: " << "OK" << std::endl;
+  LOG(INFO) << "Error ocurre: " << std::boolalpha << (glGetError() != GL_NO_ERROR) 
+            << std::dec << std::endl;
 #endif
   
 }

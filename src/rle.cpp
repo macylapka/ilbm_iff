@@ -1,8 +1,7 @@
 #include <rle.h>
 
-std::unique_ptr<char unsigned[]> run_length_encoding::decode(
-  std::unique_ptr<char unsigned[]> enc, 
-  int unsigned &len) {
+std::unique_ptr<char unsigned[]> run_length_encoding::decode(std::unique_ptr<char unsigned[]> enc, 
+                                                             int unsigned &len) {
   
   std::vector<char unsigned> dec_data;
  
@@ -13,10 +12,12 @@ std::unique_ptr<char unsigned[]> run_length_encoding::decode(
     if(p_data[pos] >= 0) {
       for(int j = 0; j < p_data[pos] + 1; ++j)
         dec_data.push_back(p_data[pos + j + 1]); 
+      
       pos += p_data[pos] + 2;
     } else if(p_data[pos] >= -127 && p_data[pos] <= -1) {
       for(int j = 0; j < (-p_data[pos] + 1); ++j) 
         dec_data.push_back(-p_data[pos + 1]);
+      
       pos += 2; 
     } else if(p_data[pos] == -128) {
       ++pos; 

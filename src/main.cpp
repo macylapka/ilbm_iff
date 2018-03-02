@@ -31,41 +31,8 @@ int double_buffer_attributes[] = {
     None
 };
 
-std::string path = "/home/macylapka/Projects/"
-    "opengl_x11.git/samples/pictures/Jetsons_rosie.ilbm";
+std::string path = "./samples/pictures/Jetsons_rosie.ilbm";
 ilbm_iff ilbm_image(path);
-
-void clean();
-void update();
-void gl_init();
-void display();
-void reshape(int, int);
-void key_press(window*, XKeyEvent&);
-void key_release(window*, XKeyEvent&);
-void button_press(window*, XButtonEvent&);
-void button_release(window*, XButtonEvent&);
-
-int main(int argc, char **argv) {
- 
-  google::InitGoogleLogging(argv[0]);
-  FLAGS_logtostderr = 1;    
-
-  XInitThreads(); 
-  window wnd("My window manager", single_buffer_attributes);
-  try {
-    wnd.init();
-  } catch (char const *msg) {
-    std::cout << "Catch: " << msg << std::endl;
-  }    
-  wnd.set_gl_init(gl_init);  
-  wnd.set_key_press_event(key_press);
-  wnd.set_key_release_event(key_release);
-  wnd.set_mouse_button_press_event(button_press);
-  wnd.set_mouse_button_release_event(button_release);
-  wnd.set_reshape_event(reshape);  
-  wnd.run();  
-  return 0;
-}
 
 void gl_init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -155,16 +122,40 @@ void key_press(window *sender, XKeyEvent &event) {
 }
 
 void key_release(window *sender, XKeyEvent &event) {
-  //LOG(INFO) << "Key was released " << event.keycode 
-  //          << " and state is " << event.state;   
+  LOG(INFO) << "Key was released " << event.keycode 
+            << " and state is " << event.state;   
 }
 
 void button_press(window *sender, XButtonEvent &event) {
-  //LOG(INFO) << "Mouse button was pressed on x = " << event.x
-  //          << "y = " << event.y;
+  LOG(INFO) << "Mouse button was pressed on x = " << event.x
+            << "y = " << event.y;
 }
 
 void button_release(window *sender, XButtonEvent &event) {
-  //LOG(INFO) << "Mouse button was released on x = " << event.x
-  //          << "y = " << event.y;
+  LOG(INFO) << "Mouse button was released on x = " << event.x
+            << "y = " << event.y;
 }
+
+
+int main(int argc, char **argv) {
+ 
+  google::InitGoogleLogging("Test");
+  //FLAGS_logtostderr = 1;    
+
+  XInitThreads(); 
+  window wnd("My window manager", single_buffer_attributes);
+  try {
+    wnd.init();
+  } catch (char const *msg) {
+    std::cout << "Catch: " << msg << std::endl;
+  }    
+  wnd.set_gl_init(gl_init);  
+  wnd.set_key_press_event(key_press);
+  wnd.set_key_release_event(key_release);
+  wnd.set_mouse_button_press_event(button_press);
+  wnd.set_mouse_button_release_event(button_release);
+  wnd.set_reshape_event(reshape);  
+  wnd.run();  
+  return 0;
+}
+
